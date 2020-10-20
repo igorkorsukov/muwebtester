@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>MU Web Audio Tester</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+
+        #output {
+            width: 100%;
+            height: 200px;
+            margin: 10 auto;
+            display: block;
+            background-color: black;
+            color: white;
+            font-family: 'Lucida Console', Monaco, monospace;
+            outline: none;
+        }
+        #status_out {
+            width: 100%;
+            height: 20px;
+            margin: 10 auto;
+            display: block;
+            font-family: 'Lucida Console', Monaco, monospace;
+            outline: none;
+        }
+
+        .slider {
+            width: 45%;
+            height: 12px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider_label {
+            width: 85px;
+        }
+
+        #gap400 {
+            display: inline-block;
+            overflow: hidden;
+            width: 400px;
+        }
+
+        </style>
+    </head>
+
+    <body>
+        <div id="version"> version </div>
+        <div id="status_out"> status_out </div>
+
+        <div class="container">
+        <div class="row">
+            <div class="col-12">
+            <div class="row">
+                <div class="col-4">
+                    <button class="btn btn-primary" onclick="muapi.play()"> Play </button>
+                    <button class="btn btn-primary" onclick="muapi.pause()"> Pause </button>
+                    <button class="btn btn-primary" onclick="muapi.stop()"> Stop </button>
+                </div>
+            </div>
+            <div id="sound_loading_progress"> sound loading progress: 0 </div>
+            </div>
+        </div>
+        <br>
+        <div class="col-4">
+            <label for="ctrl_volume" class="slider_label">Volume</label>
+            <input id="ctrl_volume" type="range" min="0" max="10" value="10" class="slider" oninput="setGeneralVolume(this.value)">
+            <br>
+            <label for="ctrl_balance" class="slider_label">Balance</label>
+            <input id="ctrl_balance" type="range" min="0" max="20" value="10" class="slider" oninput="setGeneralBalance(this.value)">
+            <br>
+            <label for="ctrl_pitch" class="slider_label">Pitch</label>
+            <input id="ctrl_pitch" type="range" min="-12" max="12" value="0" class="slider" oninput="setGeneralPitch(this.value)">
+            <br>
+            <label for="ctrl_transpose" class="slider_label">Transpose</label>
+            <input id="ctrl_transpose" type="range" min="-12" max="12" value="0" class="slider" oninput="setTransposeValue(this.value)">
+            <br>
+            <label for="ctrl_speed" class="slider_label">Speed</label>
+            <input id="ctrl_speed" type="range" min="0" max="20" value="10" class="slider" oninput="setPlaybackSpeed(this.value)">
+        </div>
+        <br>
+        </div>
+        <br>
+
+
+        <script type="text/javascript">
+
+
+        function soundLoadingProgress(percent) {
+            var el = document.getElementById("sound_loading_progress");
+            if (percent >= 100) {
+                el.innerHTML = "sound loaded";
+            } else {
+                el.innerHTML = "sound loading progress: " + percent;
+            }
+        }
+
+        </script>
+        <script type="text/javascript">
+
+            function setGeneralVolume(value) {
+                xtzapi.setGeneralVolume(value/10)
+            }
+
+            function setGeneralBalance(value) {
+                xtzapi.setGeneralBalance((value - 10)/10)
+            }
+
+            function setGeneralPitch(value) {
+                xtzapi.setGeneralPitch(value)
+            }
+
+            function setTransposeValue(value) {
+                xtzapi.setTransposeValue(value)
+            }
+
+            function setPlaybackSpeed(value) {
+                xtzapi.setPlaybackSpeed(value/10)
+            }
+
+            function setPartVolume(num, value) {
+                xtzapi.setPartVolume(num, value/10)
+                ui_updatePartParam(num);
+            }
+
+            function setPartBalance(num, value) {
+                xtzapi.setPartBalance(num, value/100)
+                ui_updatePartParam(num);
+            }
+
+            console.image = function(url, scale) {
+                scale = scale || 1;
+                var img = new Image();
+
+                img.onload = function() {
+                    var dim = getBox(this.width * scale, this.height * scale);
+                    console.log("%c" + dim.string, dim.style + "background: url(" + url + "); background-size: " + (this.width * scale) + "px " + (this.height * scale) + "px; color: transparent;");
+                };
+
+                img.src = url;
+            };
+
+        </script>
+
+        <script src="config.js"> </script>
+
+        <script type="module">
+        import MuApi from "./distr/muapi.js";
+
+        var VERSION = ""
+
+        document.getElementById('version').innerHTML = Config.name + ", version: " + VERSION
+
+        window.mustate = {}
+        window.muapi = MuApi({
+            status_out: document.getElementById('status_out'),
+            verbose: true,
+
+            localPrefix: "distr/"+VERSION,
+
+            audio: {
+                soundfont_uri: "sf/"+Config.sfname,
+                isFilterEnabled: Config.filter_enabled,
+                isBufferedStreamEnabled: true,
+                isLoggingSynthEvents: false
+            },
+        },
+    function() {
+
+        console.log("MuApi: loaded")
+    })
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+
+</html>
