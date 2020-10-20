@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(xtzaudio LANGUAGES C CXX)
+project(muaudio LANGUAGES C CXX)
 
 add_compile_options(
     $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>
@@ -35,25 +35,37 @@ set(EMCC_COMPILE_FLAGS "\
 
 set(WEB ON)
 
-file(GLOB muaudio_SRC
+set(MU_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../MuseScore)
+set(MU_GLOBAL ${MU_ROOT}/framework/global)
+set(MU_AUDIO ${MU_ROOT}/framework/audio)
 
-)
-
-add_definitions(
-
-)
+set(MY_AUDIO_DIR ${CMAKE_CURRENT_LIST_DIR}/../main/src/audio)
 
 include_directories(
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_SYSTEM_INCLUDE_PATH}
     ${CMAKE_SYSTEM_INCLUDE_PATH}/libc
+    ${MU_ROOT}
+    ${MU_ROOT}/framework/global
+    ${MY_AUDIO_DIR}
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMCC_COMPILE_FLAGS}")
 
 add_executable(muaudio
-    ${muaudio_SRC}
     muaudioapi.cpp
+
+    # MU Global
+    ${MU_GLOBAL}/modularity/imoduleexport.h
+
+    # Rpc
+    ${MU_AUDIO}/internal/worker/irpcaudiostreamchannel.h
+    ${MU_AUDIO}/internal/worker/rpcstreamchannelbase.cpp
+    ${MU_AUDIO}/internal/worker/rpcstreamchannelbase.h
+
+    # My audio
+    ${MY_AUDIO_DIR}/rpc/platform/web/webrpcstreamchannel.cpp
+    ${MY_AUDIO_DIR}/rpc/platform/web/webrpcstreamchannel.h
 )
 
 set_target_properties(muaudio PROPERTIES LINK_FLAGS "${EMCC_LINKER_FLAGS}")

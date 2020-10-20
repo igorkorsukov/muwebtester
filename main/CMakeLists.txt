@@ -41,11 +41,43 @@ set(EMCC_COMPILE_FLAGS "\
 
 set(WEB ON)
 
+set(MU_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../MuseScore)
+set(MU_GLOBAL ${MU_ROOT}/framework/global)
+set(MU_AUDIO ${MU_ROOT}/framework/audio)
+
+set(MY_AUDIO_DIR ${CMAKE_CURRENT_LIST_DIR}/src/audio)
+
+include_directories(
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_SYSTEM_INCLUDE_PATH}
+    ${CMAKE_SYSTEM_INCLUDE_PATH}/libc
+    ${MU_ROOT}
+    ${MU_ROOT}/framework/global
+    ${MY_AUDIO_DIR}
+)
+
 # muweb ---
 set(web_SRC
     webapi.cpp
     webmain.h
     webmain.cpp
+
+    # MU Global
+    ${MU_GLOBAL}/modularity/imoduleexport.h
+
+    # MU Audio
+    ${MU_AUDIO}/internal/iaudiodriver.h
+
+    # Rpc
+    ${MU_AUDIO}/internal/worker/irpcaudiostreamchannel.h
+    ${MU_AUDIO}/internal/worker/rpcstreamchannelbase.cpp
+    ${MU_AUDIO}/internal/worker/rpcstreamchannelbase.h
+
+    # My audio
+    ${MY_AUDIO_DIR}/platform/web/webaudiodriver.cpp
+    ${MY_AUDIO_DIR}/platform/web/webaudiodriver.h
+    ${MY_AUDIO_DIR}/rpc/platform/web/webrpcstreamchannel.cpp
+    ${MY_AUDIO_DIR}/rpc/platform/web/webrpcstreamchannel.h
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMCC_COMPILE_FLAGS}")

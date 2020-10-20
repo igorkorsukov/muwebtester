@@ -49,6 +49,7 @@ void Update() {
 
 void Play() {
     LOGI() << "Play\n";
+    mu::web::action("Create");
 }
 
 void Pause() {
@@ -57,6 +58,7 @@ void Pause() {
 
 void Stop() {
     LOGI() << "Stop\n";
+    mu::web::action("Destroy");
 }
 
 
