@@ -16,7 +16,7 @@ struct Log {
 #define LOGI() Log().ss
 #define LOGE() Log().ss
 
-#define IF_ASSERT(p) if (!p)
+#define IF_ASSERT_FAILED(p) if (!p)
 #define UNUSED(v)
 
 #endif // LOG_H

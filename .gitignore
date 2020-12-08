@@ -3,3 +3,4 @@ build.*
 *.wasm
 muaudio.js
 mumain.js
+*.user
